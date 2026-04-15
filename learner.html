@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sachet | Learner Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        :root { --bg:#f7f3ea; --ink:#1f2937; --muted:#64748b; --panel:#fffaf0; --line:rgba(30,41,59,.12); --blue:#2563eb; --purple:#7c3aed; --green:#16a34a; --orange:#f59e0b; --red:#dc2626; }
+        html { scroll-behavior:smooth; }
+        body { margin:0; font-family:Inter,"Segoe UI",Arial,sans-serif; background:radial-gradient(circle at 8% 0%, rgba(37,99,235,.17), transparent 28%), radial-gradient(circle at 90% 12%, rgba(245,158,11,.24), transparent 24%), var(--bg); color:var(--ink); }
+        .layout { display:grid; grid-template-columns:300px 1fr; min-height:100vh; }
+        .sidebar { position:sticky; top:0; height:100vh; padding:28px; background:rgba(255,250,240,.86); border-right:1px solid var(--line); backdrop-filter:blur(20px); overflow:auto; }
+        .brand { display:flex; align-items:center; gap:12px; margin-bottom:26px; }
+        .logo { width:50px; height:50px; border-radius:18px; display:grid; place-items:center; color:white; font-weight:1000; background:linear-gradient(135deg,var(--blue),var(--purple)); box-shadow:0 14px 30px rgba(37,99,235,.25); }
+        .brand h2 { margin:0; letter-spacing:-.7px; }
+        .wallet { padding:22px; border-radius:28px; color:white; background:linear-gradient(135deg,#111827,#2563eb 55%,#7c3aed); box-shadow:0 20px 50px rgba(37,99,235,.25); margin-bottom:12px; }
+        .wallet small { color:#dbeafe; }
+        .wallet strong { display:block; font-size:34px; margin-top:6px; }
+        .points { padding:16px; border-radius:22px; background:white; border:1px solid var(--line); font-weight:1000; }
+        .nav { display:grid; gap:10px; margin-top:24px; }
+        .nav a, .logout { text-decoration:none; color:var(--ink); padding:13px 14px; border-radius:16px; background:rgba(255,255,255,.65); border:1px solid var(--line); font-weight:900; }
+        .logout { width:100%; border:none; cursor:pointer; color:var(--red); margin-top:18px; }
+        .main { padding:34px; }
+        .hero { display:grid; grid-template-columns:1.2fr .8fr; gap:22px; margin-bottom:26px; }
+        .hero-card { padding:34px; border-radius:34px; background:rgba(255,255,255,.72); border:1px solid var(--line); box-shadow:0 24px 80px rgba(31,41,55,.08); backdrop-filter:blur(18px); overflow:hidden; position:relative; }
+        .hero-card:after { content:""; position:absolute; width:220px; height:220px; right:-70px; bottom:-70px; border-radius:999px; background:rgba(37,99,235,.12); }
+        h1 { margin:0; font-size:clamp(34px,5vw,62px); letter-spacing:-2.5px; line-height:.98; }
+        h2 { margin:30px 0 14px; letter-spacing:-.9px; }
+        h3 { margin:0 0 12px; }
+        .muted { color:var(--muted); line-height:1.65; }
+        .flash { margin-bottom:18px; padding:13px 16px; border-radius:16px; background:rgba(37,99,235,.1); color:#1d4ed8; border:1px solid rgba(37,99,235,.16); }
+        .stats { display:grid; gap:14px; }
+        .stat { padding:22px; border-radius:26px; background:white; border:1px solid var(--line); }
+        .stat strong { display:block; font-size:30px; }
+        .course-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:18px; }
+        .card { background:rgba(255,255,255,.78); border:1px solid var(--line); border-radius:28px; padding:22px; box-shadow:0 20px 60px rgba(31,41,55,.08); backdrop-filter:blur(18px); }
+        .badge { display:inline-flex; padding:7px 10px; border-radius:999px; background:rgba(37,99,235,.1); color:#1d4ed8; font-weight:900; font-size:12px; }
+        .badge-green { background:rgba(22,163,74,.1); color:#15803d; }
+        .badge-orange { background:rgba(245,158,11,.16); color:#92400e; }
+        .notice { padding:15px; border-radius:18px; background:#fffbeb; border:1px solid #fde68a; color:#92400e; margin:14px 0; }
+        .progress { height:12px; border-radius:999px; background:#e2e8f0; overflow:hidden; margin:14px 0; }
+        .bar { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--green),#22c55e); }
+        .video-list { display:grid; gap:16px; }
+        .video-card { display:grid; grid-template-columns:minmax(280px,480px) 1fr; gap:18px; align-items:start; }
+        .video-box { aspect-ratio:16/9; background:#020617; overflow:hidden; border-radius:20px; border:1px solid rgba(15,23,42,.18); }
+        iframe { width:100%; height:100%; border:0; }
+        .btn { display:inline-flex; justify-content:center; align-items:center; gap:8px; width:100%; padding:13px 16px; border-radius:16px; border:none; text-decoration:none; cursor:pointer; font-weight:1000; color:white; background:linear-gradient(135deg,var(--blue),var(--purple)); }
+        .btn-green { background:linear-gradient(135deg,#16a34a,#22c55e); }
+        .btn-orange { background:linear-gradient(135deg,#f59e0b,#f97316); color:#111827; }
+        .btn-soft { background:#eef2ff; color:#3730a3; }
+        .btn-disabled { background:#cbd5e1; color:#475569; cursor:not-allowed; }
+        input, textarea, select { width:100%; padding:13px 14px; border-radius:15px; border:1px solid var(--line); outline:none; margin:8px 0; background:rgba(255,255,255,.8); }
+        .quiz-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:18px; }
+        .result { padding:12px; border-radius:16px; background:#f8fafc; border:1px solid var(--line); margin-top:10px; }
+        .market-card { display:flex; flex-direction:column; gap:12px; }
+        .thumb { height:150px; border-radius:24px; display:grid; place-items:center; color:white; background:linear-gradient(135deg,#2563eb,#7c3aed,#f59e0b); font-size:46px; font-weight:1000; }
+        .split { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+        .table-wrap { overflow:auto; }
+        table { width:100%; border-collapse:collapse; }
+        th, td { padding:12px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+        .roadmap { display:grid; gap:10px; margin-top:16px; }
+        .road-step { display:grid; grid-template-columns:34px 1fr; gap:10px; align-items:start; }
+        .dot { width:28px; height:28px; border-radius:999px; display:grid; place-items:center; background:#dbeafe; color:#1d4ed8; font-weight:1000; }
+        .done .dot { background:#dcfce7; color:#15803d; }
+        .reels { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(260px,330px); gap:18px; overflow-x:auto; padding-bottom:10px; }
+        .reel { min-height:520px; border-radius:34px; padding:18px; color:white; background:linear-gradient(160deg,#020617,#1d4ed8 58%,#7c3aed); display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 28px 70px rgba(15,23,42,.25); }
+        .reel .video-box { border-radius:28px; aspect-ratio:9/16; }
+        .bet-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+        .challenge { padding:14px; border:1px solid var(--line); border-radius:18px; background:white; }
+        .chatbot { position:fixed; right:24px; bottom:24px; width:min(380px,calc(100vw - 40px)); z-index:20; }
+        .chat-window { display:none; background:white; border:1px solid var(--line); border-radius:24px; box-shadow:0 24px 80px rgba(15,23,42,.24); overflow:hidden; }
+        .chat-head { padding:16px; background:linear-gradient(135deg,var(--blue),var(--purple)); color:white; font-weight:1000; }
+        .chat-body { height:280px; overflow:auto; padding:14px; display:grid; gap:10px; align-content:start; }
+        .bubble { padding:11px 13px; border-radius:16px; background:#f1f5f9; line-height:1.45; }
+        .bubble.user { background:#dbeafe; justify-self:end; max-width:86%; }
+        .bubble.bot { justify-self:start; max-width:90%; }
+        .chat-form { display:flex; gap:8px; padding:12px; border-top:1px solid var(--line); }
+        .chat-form input { margin:0; }
+        .chat-toggle { margin-left:auto; width:auto; border-radius:999px; padding:14px 18px; box-shadow:0 18px 50px rgba(37,99,235,.35); }
+        @media (max-width:1050px){ .layout{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.hero,.video-card,.split{grid-template-columns:1fr}.main{padding:22px} }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand"><div class="logo">S</div><div><h2>Sachet Learn</h2><span class="badge">Learner Portal</span></div></div>
+            <div class="wallet"><small>Available Learning Credits</small><strong>₹{{ "%.2f"|format(user.balance) }}</strong></div>
+            <div class="points">Learning Points: {{ user.points }}</div>
+            <nav class="nav">
+                <a href="#my-courses">My Courses</a>
+                <a href="#protection">Payment Protection</a>
+                <a href="#streaks">Streak Betting</a>
+                <a href="#analytics">Analytics</a>
+                <a href="#reels">Learning Reels</a>
+                <a href="#videos">Video Lessons</a>
+                <a href="#quizzes">Quiz Portal</a>
+                <a href="#market">At Present Courses</a>
+            </nav>
+            <button onclick="location.href='/logout'" class="logout">Sign Out</button>
+        </aside>
+
+        <main class="main">
+            {% with messages = get_flashed_messages() %}{% if messages %}{% for message in messages %}<div class="flash">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+
+            <section class="hero">
+                <div class="hero-card">
+                    <h1>Hello, {{ user.username }}. Build your future one course at a time.</h1>
+                    <p class="muted">Sachet now combines EdTech + FinTech + EduInsure concepts: protected payment methods, streak betting, visual progress analytics, course roadmaps, reels learning, and AI-style learner help.</p>
+                </div>
+                <div class="stats">
+                    <div class="stat"><strong>{{ my_courses|length }}</strong><span class="muted">Unlocked courses</span></div>
+                    <div class="stat"><strong>{{ quizzes|length }}</strong><span class="muted">Quiz questions available</span></div>
+                    <div class="stat"><strong>{{ market|length }}</strong><span class="muted">Courses in marketplace</span></div>
+                </div>
+            </section>
+
+            <section id="my-courses">
+                <h2>My Current Courses, Progress Tracker & Roadmap</h2>
+                {% if my_courses %}
+                    <div class="course-grid">
+                        {% for c in my_courses %}
+                            {% set percent = (c.completed_videos * 100 / c.total_videos) if c.total_videos else 0 %}
+                            <article class="card">
+                                <span class="badge">{{ c.duration_months }} month path · Professor {{ c.creator_name }}</span>
+                                <h3 style="margin-top:14px;">{{ c.title }}</h3>
+                                <p class="muted">{{ c.description or 'Continue your course lessons and complete all requirements.' }}</p>
+                                <div class="notice"><strong>Notice Board:</strong> {{ c.notice }}</div>
+                                <div class="progress"><div class="bar" style="width: {{ percent }}%;"></div></div>
+                                <p class="muted"><strong>{{ "%.0f"|format(percent) }}%</strong> complete · {{ c.completed_videos }}/{{ c.total_videos }} videos completed</p>
+                                <div class="roadmap">
+                                    <div class="road-step {% if c.completed_videos > 0 %}done{% endif %}"><div class="dot">1</div><div><strong>Start modules</strong><br><span class="muted">Watch the first video lesson.</span></div></div>
+                                    <div class="road-step {% if c.total_videos and c.completed_videos == c.total_videos %}done{% endif %}"><div class="dot">2</div><div><strong>Complete topic videos</strong><br><span class="muted">Finish all modules in sequence.</span></div></div>
+                                    <div class="road-step {% if c.attendance_marked %}done{% endif %}"><div class="dot">3</div><div><strong>Mark attendance</strong><br><span class="muted">At least 30 watched minutes required.</span></div></div>
+                                    <div class="road-step {% if c.completed %}done{% endif %}"><div class="dot">4</div><div><strong>Certificate & payment release</strong><br><span class="muted">QR certificate unlocks and creator revenue releases.</span></div></div>
+                                </div>
+                                <div style="height:14px;"></div>
+                                {% if c.attendance_marked %}
+                                    <button class="btn btn-soft" type="button">Attendance Marked</button>
+                                {% else %}
+                                    <a href="/mark_attendance/{{ c.id }}" class="btn btn-orange">Mark Attendance After 30 Minutes</a>
+                                {% endif %}
+                                <div style="height:10px;"></div>
+                                {% if c.completed %}
+                                    <a href="/certificate/{{ c.id }}" class="btn btn-green">View Completion Certificate</a>
+                                {% elif c.total_videos and c.completed_videos == c.total_videos and c.attendance_marked %}
+                                    <a href="/complete_course/{{ c.id }}" class="btn btn-green">Complete Course & Generate Certificate</a>
+                                {% else %}
+                                    <button class="btn btn-disabled" type="button">Certificate unlocks after videos + attendance</button>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="card"><p class="muted">Your learning shelf is empty. Unlock a course from At Present Courses below.</p></div>
+                {% endif %}
+            </section>
+
+            <section id="protection" class="split">
+                <div class="card">
+                    <h2 style="margin-top:0;">FinTech + EduInsure Protection</h2>
+                    <p class="muted">Course fees are held as protected payments. Creator revenue is released only after learning completion, which supports course fee protection, refund protection, learning guarantee, subscription protection, and skill development insurance concepts.</p>
+                    <div class="course-grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));">
+                        <div class="notice"><strong>Course Fee Protection</strong><br>Payment held safely.</div>
+                        <div class="notice"><strong>Refund Protection</strong><br>Creator abandonment concept.</div>
+                        <div class="notice"><strong>Learning Guarantee</strong><br>Support if learner struggles.</div>
+                        <div class="notice"><strong>Skill Insurance</strong><br>Skill growth accountability.</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 style="margin-top:0;">Payment History</h2>
+                    {% if payments %}
+                        <div class="table-wrap"><table><tr><th>Course</th><th>Method</th><th>Status</th><th>Ref</th></tr>{% for p in payments %}<tr><td>{{ p.course_title }}</td><td>{{ p.method }}</td><td>{{ p.status }}<br><small class="muted">{{ p.protection_status }}</small></td><td>{{ p.reference }}</td></tr>{% endfor %}</table></div>
+                    {% else %}<p class="muted">Unlock a course to see protected payment records.</p>{% endif %}
+                </div>
+            </section>
+
+            <section id="streaks" class="split">
+                <div class="card">
+                    <h2 style="margin-top:0;">Streak Betting Challenge</h2>
+                    <p class="muted">Choose a duration, wager learning points, and complete at least one module every day. Only one active bet is allowed at a time.</p>
+                    {% if active_bet %}
+                        <div class="notice"><strong>Active Bet:</strong> {{ active_bet.duration_days }} days · {{ active_bet.wager }} pts · {{ active_bet.multiplier }}x<br>Progress: {{ active_bet.completed_days }}/{{ active_bet.duration_days }} daily modules · Ends {{ active_bet.end_date }}</div>
+                    {% else %}
+                        <form action="/place_bet" method="POST">
+                            <div class="bet-options">
+                                {% for days, challenge in streak_challenges.items() %}
+                                    <label class="challenge"><input type="radio" name="duration_days" value="{{ days }}" required> <strong>{{ days }} days</strong><br><span class="muted">{{ challenge.multiplier }}x · {{ challenge.risk }}</span></label>
+                                {% endfor %}
+                            </div>
+                            <select name="wager" required><option value="">Choose wager</option><option value="50">50 points</option><option value="100">100 points</option><option value="200">200 points</option><option value="500">500 points</option></select>
+                            <button class="btn btn-orange" type="submit">Place Streak Bet</button>
+                        </form>
+                    {% endif %}
+                </div>
+                <div class="card">
+                    <h2 style="margin-top:0;">Bet History</h2>
+                    {% if bet_history %}
+                        <div class="table-wrap"><table><tr><th>Challenge</th><th>Wager</th><th>Status</th><th>Reward</th></tr>{% for b in bet_history %}<tr><td>{{ b.duration_days }} days<br><small class="muted">{{ b.start_date }} → {{ b.end_date }}</small></td><td>{{ b.wager }} pts</td><td>{{ b.status }}</td><td>{{ b.reward }} pts</td></tr>{% endfor %}</table></div>
+                    {% else %}<p class="muted">Past wins/losses will appear here.</p>{% endif %}
+                </div>
+            </section>
+
+            <section id="analytics" class="split">
+                <div class="card">
+                    <h2 style="margin-top:0;">Progress Analytics Dashboard</h2>
+                    <canvas id="progressChart" height="180"></canvas>
+                    <p class="muted">Users can track financial literacy growth visually.</p>
+                </div>
+                <div class="card">
+                    <h2 style="margin-top:0;">Topics Completed & Weak Areas</h2>
+                    {% if analytics %}
+                        <div class="table-wrap"><table><tr><th>Course</th><th>Topics</th><th>Quiz</th><th>Weak Areas</th></tr>{% for a in analytics %}<tr><td>{{ a.title }}</td><td>{{ a.completed_videos }}/{{ a.total_videos }} videos</td><td>{{ a.correct_quizzes }}/{{ a.total_quizzes }} correct</td><td>{{ a.weak_topics }}</td></tr>{% endfor %}</table></div>
+                    {% endif %}
+                    {% if weak_areas %}
+                        <h3>Needs Improvement</h3>
+                        {% for w in weak_areas %}<div class="result"><strong>{{ w.course_title }}</strong><br>{{ w.question }}<br><span class="muted">{{ w.status }}{% if w.feedback %}: {{ w.feedback }}{% endif %}</span></div>{% endfor %}
+                    {% else %}<p class="muted">No weak areas identified yet. Submit quizzes to receive evaluation.</p>{% endif %}
+                </div>
+            </section>
+
+            <section id="reels">
+                <h2>Reels-Style Learning Feed</h2>
+                {% if course_videos %}
+                    <div class="reels">
+                        {% for v in course_videos %}
+                        <article class="reel">
+                            <div>
+                                <span class="badge badge-orange">{{ v.course_title }}</span>
+                                <h3 style="margin-top:14px;">{{ v.title }}</h3>
+                            </div>
+                            <div class="video-box"><iframe src="{{ v.video_url }}" allowfullscreen></iframe></div>
+                            <div>
+                                <p>Short focus lesson · {{ v.minutes_required }} required minutes</p>
+                                {% if v.completed %}<button type="button" class="btn btn-green">Completed</button>{% else %}<a href="/complete_video/{{ v.id }}" class="btn">Complete From Reel</a>{% endif %}
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                {% else %}<div class="card"><p class="muted">Unlock a course to activate your reels feed.</p></div>{% endif %}
+            </section>
+
+            <section id="videos">
+                <h2>Course Video Section</h2>
+                {% if course_videos %}
+                    <div class="video-list">
+                    {% for v in course_videos %}
+                        <article class="card video-card">
+                            <div class="video-box"><iframe src="{{ v.video_url }}" allowfullscreen></iframe></div>
+                            <div>
+                                <span class="badge">{{ v.course_title }}</span>
+                                <h3 style="margin-top:14px;">{{ v.title }}</h3>
+                                <p class="muted">Required watch time: {{ v.minutes_required }} minutes. After watching, mark this video as completed. This also counts toward your active streak bet once per day.</p>
+                                {% if v.completed %}<button type="button" class="btn btn-green">Video Completed</button>{% else %}<a href="/complete_video/{{ v.id }}" class="btn">I Watched This Video</a>{% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                    </div>
+                {% else %}<div class="card"><p class="muted">Unlock a course to see its video lessons here.</p></div>{% endif %}
+            </section>
+
+            <section id="quizzes">
+                <h2>Quiz Portal & Mistake Review</h2>
+                {% if quizzes %}
+                    <div class="quiz-grid">
+                    {% for q in quizzes %}
+                        <article class="card">
+                            <span class="badge">{{ q.course_title }}</span>
+                            <h3 style="margin-top:14px;">{{ q.question }}</h3>
+                            {% if q.submission_id %}
+                                <div class="result"><strong>Your answer:</strong> {{ q.user_answer }}<br><strong>Result:</strong> {{ q.status }}<br>{% if q.feedback %}<strong>Feedback:</strong> {{ q.feedback }}{% else %}<span class="muted">Waiting for creator feedback.</span>{% endif %}</div>
+                                <form action="/submit_quiz" method="POST"><input type="hidden" name="qid" value="{{ q.id }}"><textarea name="ans" placeholder="Improve your answer and resubmit"></textarea><button type="submit" class="btn">Resubmit Quiz</button></form>
+                            {% else %}
+                                <form action="/submit_quiz" method="POST"><input type="hidden" name="qid" value="{{ q.id }}"><textarea name="ans" placeholder="Type your answer here" required></textarea><button type="submit" class="btn">Submit Answer</button></form>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                    </div>
+                {% else %}<div class="card"><p class="muted">No quizzes are available yet for your unlocked courses.</p></div>{% endif %}
+            </section>
+
+            <section id="market">
+                <h2>At Present Courses</h2>
+                <div class="course-grid">
+                    {% for m in market %}
+                    <article class="card market-card">
+                        <div class="thumb">{{ m.title[:1] }}</div>
+                        <span class="badge">{{ m.video_count }} videos · {{ m.duration_months }} months</span>
+                        <h3>{{ m.title }}</h3>
+                        <p class="muted">{{ m.description or 'A creator-led Sachet course with videos, attendance, quizzes and certificate.' }}</p>
+                        <p class="muted">Creator: <strong>{{ m.creator_name }}</strong></p>
+                        <div style="font-size:30px;font-weight:1000;color:#1d4ed8;">₹{{ "%.2f"|format(m.price) }}</div>
+                        <form action="/buy/{{ m.id }}" method="POST">
+                            <select name="payment_method" required>
+                                {% for key, label in payment_methods.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-green">Unlock With Protected Payment</button>
+                        </form>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="chatbot">
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-head">Sachet HelpBot · User Support</div>
+            <div class="chat-body" id="chatBody"><div class="bubble bot">Ask me about payments, streak betting, progress, roadmap, quizzes, certificates, or learning methodology.</div></div>
+            <form class="chat-form" id="chatForm"><input id="chatInput" type="text" placeholder="Type your question" autocomplete="off"><button class="btn" style="width:auto;" type="submit">Send</button></form>
+        </div>
+        <button class="btn chat-toggle" onclick="toggleChat()" type="button">Help Chat</button>
+    </div>
+
+    <script>
+        const analyticsLabels = {{ analytics|map(attribute='title')|list|tojson }};
+        const analyticsValues = {{ analytics|map(attribute='completed_videos')|list|tojson }};
+        const analyticsTotals = {{ analytics|map(attribute='total_videos')|list|tojson }};
+        const progressValues = analyticsValues.map((value, index) => analyticsTotals[index] ? Math.round(value * 100 / analyticsTotals[index]) : 0);
+        const chartCanvas = document.getElementById('progressChart');
+        if (chartCanvas) {
+            new Chart(chartCanvas, {
+                type: 'bar',
+                data: { labels: analyticsLabels, datasets: [{ label: 'Progress %', data: progressValues, backgroundColor: '#2563eb', borderRadius: 12 }] },
+                options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+            });
+        }
+        function toggleChat() {
+            const windowEl = document.getElementById('chatWindow');
+            windowEl.style.display = windowEl.style.display === 'block' ? 'none' : 'block';
+        }
+        document.getElementById('chatForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            const body = document.getElementById('chatBody');
+            body.insertAdjacentHTML('beforeend', `<div class="bubble user"></div>`);
+            body.lastElementChild.textContent = message;
+            input.value = '';
+            const thinking = document.createElement('div');
+            thinking.className = 'bubble bot';
+            thinking.textContent = 'Thinking...';
+            body.appendChild(thinking);
+            body.scrollTop = body.scrollHeight;
+            try {
+                const response = await fetch('/chatbot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) });
+                const data = await response.json();
+                thinking.textContent = data.reply;
+            } catch (error) {
+                thinking.textContent = 'HelpBot is temporarily unavailable. Try asking about payments, streaks, progress, or certificates.';
+            }
+            body.scrollTop = body.scrollHeight;
+        });
+    </script>
+</body>
+</html>

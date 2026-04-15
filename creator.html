@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sachet | Creator Studio</title>
+    <style>
+        * { box-sizing: border-box; }
+        :root { --bg:#07111f; --panel:#0f172a; --line:rgba(148,163,184,.18); --text:#f8fafc; --muted:#94a3b8; --blue:#38bdf8; --green:#22c55e; --violet:#8b5cf6; --orange:#f59e0b; --red:#ef4444; }
+        body { margin:0; font-family:Inter,"Segoe UI",Arial,sans-serif; background:radial-gradient(circle at top left, rgba(56,189,248,.2), transparent 26%), radial-gradient(circle at bottom right, rgba(139,92,246,.2), transparent 28%), var(--bg); color:var(--text); }
+        .layout { display:grid; grid-template-columns:300px 1fr; min-height:100vh; }
+        .sidebar { position:sticky; top:0; height:100vh; padding:28px; background:rgba(2,6,23,.82); border-right:1px solid var(--line); backdrop-filter:blur(18px); }
+        .brand { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+        .mark { width:48px; height:48px; border-radius:16px; display:grid; place-items:center; font-weight:1000; background:linear-gradient(135deg,var(--blue),var(--violet)); }
+        .brand h2 { margin:0; letter-spacing:-.5px; }
+        .pill { display:inline-flex; padding:7px 11px; border-radius:999px; background:rgba(34,197,94,.12); color:#86efac; font-weight:800; font-size:12px; }
+        .stat { margin:18px 0; padding:20px; border-radius:24px; background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(56,189,248,.1)); border:1px solid rgba(34,197,94,.25); }
+        .stat small { color:var(--muted); }
+        .stat strong { display:block; font-size:34px; margin-top:6px; }
+        .nav { display:grid; gap:10px; margin-top:24px; }
+        .nav a, .logout { color:var(--text); text-decoration:none; padding:13px 14px; border-radius:16px; background:rgba(15,23,42,.65); border:1px solid var(--line); font-weight:800; }
+        .logout { border:none; width:100%; cursor:pointer; background:rgba(239,68,68,.15); color:#fecaca; margin-top:18px; }
+        .main { padding:34px; }
+        .top { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:28px; }
+        h1 { margin:0; font-size:42px; letter-spacing:-1.8px; }
+        .muted { color:var(--muted); line-height:1.6; }
+        .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+        .card { background:rgba(15,23,42,.78); border:1px solid var(--line); border-radius:26px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.18); backdrop-filter:blur(18px); }
+        .card h3 { margin:0 0 16px; }
+        input, textarea, select { width:100%; padding:13px 14px; margin:8px 0; border-radius:15px; border:1px solid rgba(148,163,184,.22); background:rgba(2,6,23,.68); color:white; outline:none; }
+        textarea { min-height:92px; resize:vertical; }
+        button, .btn { display:inline-flex; justify-content:center; align-items:center; padding:12px 15px; border-radius:15px; border:none; text-decoration:none; cursor:pointer; font-weight:900; color:white; background:linear-gradient(135deg,#2563eb,#7c3aed); width:100%; }
+        .btn-green { background:linear-gradient(135deg,#16a34a,#22c55e); }
+        .btn-orange { background:linear-gradient(135deg,#d97706,#f59e0b); color:#111827; }
+        .btn-red { background:linear-gradient(135deg,#dc2626,#ef4444); }
+        .section { margin-top:28px; }
+        .course { display:grid; grid-template-columns:1fr 360px; gap:18px; margin-bottom:18px; }
+        .course-title { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+        .badge { padding:7px 10px; border-radius:999px; background:rgba(56,189,248,.12); color:#7dd3fc; font-weight:900; font-size:12px; }
+        table { width:100%; border-collapse:collapse; }
+        th, td { padding:13px 10px; border-bottom:1px solid rgba(148,163,184,.14); text-align:left; vertical-align:top; }
+        th { color:#cbd5e1; font-size:13px; text-transform:uppercase; letter-spacing:.8px; }
+        .split { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+        .flash { margin-bottom:18px; padding:13px 16px; border-radius:16px; background:rgba(56,189,248,.14); color:#bae6fd; border:1px solid rgba(56,189,248,.25); }
+        @media (max-width:1050px){ .layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.grid,.split,.course{grid-template-columns:1fr}.main{padding:22px} }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand"><div class="mark">S</div><div><h2>Creator Studio</h2><span class="pill">Live earning dashboard</span></div></div>
+            <div class="stat"><small>Total Released Revenue</small><strong>₹{{ "%.2f"|format(user.revenue) }}</strong></div>
+            <div class="nav">
+                <a href="#publish">Publish Course</a>
+                <a href="#courses">Manage Courses</a>
+                <a href="#payments">Protected Payments</a>
+                <a href="#attendance">Attendance</a>
+                <a href="#submissions">Quiz Evaluation</a>
+            </div>
+            <button onclick="location.href='/logout'" class="logout">Sign Out</button>
+        </aside>
+
+        <main class="main">
+            <div class="top">
+                <div><h1>Welcome, {{ user.username }}</h1><p class="muted">Publish courses, add multiple videos, post notices, create quizzes, track attendance, evaluate answers and receive revenue after learners complete courses.</p></div>
+            </div>
+
+            {% with messages = get_flashed_messages() %}{% if messages %}{% for message in messages %}<div class="flash">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+
+            <section class="grid">
+                <div class="card"><h3>Courses</h3><div style="font-size:34px;font-weight:1000;">{{ courses|length }}</div><p class="muted">Published courses</p></div>
+                <div class="card"><h3>Videos</h3><div style="font-size:34px;font-weight:1000;">{{ videos|length }}</div><p class="muted">Lessons uploaded</p></div>
+                <div class="card"><h3>Quiz Sheets</h3><div style="font-size:34px;font-weight:1000;">{{ submissions|length }}</div><p class="muted">Learner submissions</p></div>
+                <div class="card"><h3>Protected Payments</h3><div style="font-size:34px;font-weight:1000;">{{ protected_payments|length }}</div><p class="muted">FinTech holds and release records</p></div>
+            </section>
+
+            <section id="publish" class="section card">
+                <h3>Publish New Course</h3>
+                <form action="/publish" method="POST" class="split">
+                    <div>
+                        <input type="text" name="title" placeholder="Course name: Java Full Stack, DBMS, Python Web Development" required>
+                        <textarea name="description" placeholder="Course description and what learners will achieve"></textarea>
+                        <input type="number" name="price" placeholder="Price in Indian Rupees" required min="1">
+                    </div>
+                    <div>
+                        <input type="number" name="duration_months" placeholder="Duration in months" value="3" min="1" max="24">
+                        <input type="text" name="video_title" placeholder="First video title" required>
+                        <input type="text" name="url" placeholder="YouTube URL or embed URL" required>
+                        <button type="submit">Launch Course</button>
+                    </div>
+                </form>
+            </section>
+
+            <section id="courses" class="section">
+                <h2>Manage Your Courses</h2>
+                {% if courses %}
+                    {% for c in courses %}
+                    <div class="course">
+                        <div class="card">
+                            <div class="course-title"><h3>{{ c.title }}</h3><span class="badge">₹{{ c.price }} · {{ c.duration_months }} months</span></div>
+                            <p class="muted">{{ c.description or 'No description added yet.' }}</p>
+                            <p><strong>{{ c.video_count }}</strong> videos · <strong>{{ c.learner_count }}</strong> learners · <strong>{{ c.completed_count or 0 }}</strong> completed</p>
+                            <form action="/post_notice" method="POST">
+                                <input type="hidden" name="course_id" value="{{ c.id }}">
+                                <textarea name="notice" placeholder="Post a notice learners will see on their dashboard">{{ c.notice }}</textarea>
+                                <button class="btn-orange" type="submit">Update Notice Board</button>
+                            </form>
+                        </div>
+                        <div class="card">
+                            <h3>Add Video</h3>
+                            <form action="/add_video" method="POST">
+                                <input type="hidden" name="course_id" value="{{ c.id }}">
+                                <input type="text" name="title" placeholder="Video lesson title" required>
+                                <input type="text" name="url" placeholder="YouTube URL" required>
+                                <input type="number" name="minutes_required" value="30" min="1" placeholder="Required watch minutes">
+                                <button type="submit" class="btn-green">Add Video</button>
+                            </form>
+                            <h3 style="margin-top:18px;">Create Quiz</h3>
+                            <form action="/add_quiz" method="POST">
+                                <input type="hidden" name="cid" value="{{ c.id }}">
+                                <input type="text" name="q" placeholder="Quiz question" required>
+                                <input type="text" name="a" placeholder="Correct answer" required>
+                                <button type="submit">Attach Quiz</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card"><p class="muted">No courses yet. Publish your first course above.</p></div>
+                {% endif %}
+            </section>
+
+            <section class="section split">
+                <div class="card">
+                    <h3>Uploaded Videos</h3>
+                    {% if videos %}
+                        <table><tr><th>Course</th><th>Video</th><th>Minutes</th></tr>{% for v in videos %}<tr><td>{{ v.course_title }}</td><td>{{ v.title }}</td><td>{{ v.minutes_required }}</td></tr>{% endfor %}</table>
+                    {% else %}<p class="muted">No videos uploaded yet.</p>{% endif %}
+                </div>
+                <div class="card">
+                    <h3>Created Quizzes</h3>
+                    {% if quizzes %}
+                        <table><tr><th>Course</th><th>Question</th></tr>{% for q in quizzes %}<tr><td>{{ q.course_title }}</td><td>{{ q.question }}</td></tr>{% endfor %}</table>
+                    {% else %}<p class="muted">No quiz questions created yet.</p>{% endif %}
+                </div>
+            </section>
+
+            <section id="payments" class="section card">
+                <h3>FinTech Protected Payments & EduInsure Status</h3>
+                <p class="muted">Learner course fees are held safely first. Revenue is released to creators after the learner completes course requirements, supporting course fee protection, refund protection, learning guarantee and creator accountability.</p>
+                {% if protected_payments %}
+                <table>
+                    <tr><th>Learner</th><th>Course</th><th>Method</th><th>Amount</th><th>Status</th><th>Reference</th></tr>
+                    {% for p in protected_payments %}
+                    <tr>
+                        <td>{{ p.learner_name }}</td>
+                        <td>{{ p.course_title }}</td>
+                        <td>{{ p.method }}</td>
+                        <td>₹{{ "%.2f"|format(p.amount) }}</td>
+                        <td>{{ p.status }}<br><small class="muted">{{ p.protection_status }}</small></td>
+                        <td>{{ p.reference }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}<p class="muted">No protected payment records yet.</p>{% endif %}
+            </section>
+
+            <section id="attendance" class="section card">
+                <h3>Learner Attendance</h3>
+                {% if attendance %}
+                <table>
+                    <tr><th>Learner</th><th>Course</th><th>Attendance</th><th>Completion</th><th>Payment</th></tr>
+                    {% for a in attendance %}
+                    <tr>
+                        <td>{{ a.username }}</td><td>{{ a.course_title }}</td>
+                        <td>{% if a.attendance_marked %}Marked{% else %}Pending{% endif %}</td>
+                        <td>{% if a.completed %}Completed on {{ a.completed_at }}{% else %}In Progress{% endif %}</td>
+                        <td>{% if a.payment_released %}Released ₹{{ a.paid_amount }}{% else %}Held until completion{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}<p class="muted">No learners enrolled yet.</p>{% endif %}
+            </section>
+
+            <section id="submissions" class="section card">
+                <h3>Quiz Submissions & Evaluation</h3>
+                {% if submissions %}
+                <table>
+                    <tr><th>Student</th><th>Course</th><th>Question</th><th>Answer</th><th>Evaluate</th></tr>
+                    {% for s in submissions %}
+                    <tr>
+                        <td>{{ s.username }}</td><td>{{ s.course_title }}</td><td>{{ s.question }}<br><small class="muted">Correct: {{ s.correct_answer }}</small></td><td>{{ s.user_answer }}<br><small class="muted">Current: {{ s.status }}</small></td>
+                        <td>
+                            <form action="/evaluate_quiz/{{ s.id }}" method="POST">
+                                <select name="status"><option>Correct</option><option>Partially Correct</option><option>Needs Improvement</option></select>
+                                <input type="text" name="feedback" placeholder="Feedback / mistake explanation">
+                                <button type="submit" class="btn-green">Send Result</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}<p class="muted">No submissions yet.</p>{% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

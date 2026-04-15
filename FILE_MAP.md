@@ -1,0 +1,480 @@
+# Sachet EdTech System File Map
+
+## Main Project Folder
+
+```text
+Sachet_EdTech_System/
+```
+
+This folder contains the complete Flask-based Sachet EdTech + FinTech + EduInsure platform.
+
+---
+
+## Backend Application
+
+### `run.py`
+
+Main Flask backend file.
+
+Handles:
+
+- Flask app setup
+- SQLite database connection
+- Database table creation
+- Demo course seeding
+- User signup and login
+- Learner dashboard route
+- Creator dashboard route
+- Course publishing
+- Video upload
+- Notice board updates
+- Quiz creation
+- Quiz submission
+- Quiz evaluation
+- Course purchase flow
+- Protected payment records
+- Course fee protection logic
+- Creator revenue release after course completion
+- Video progress tracking
+- Attendance marking
+- Course completion
+- Certificate generation
+- PDF certificate download
+- QR certificate verification
+- Streak betting backend logic
+- Bet history persistence
+- Progress analytics queries
+- AI chatbot endpoint
+
+Important backend sections:
+
+```text
+PAYMENT_METHODS
+```
+
+Defines available payment methods:
+
+- Sachet Wallet Credits
+- UPI Payment
+- Credit / Debit Card
+- Net Banking
+- Stripe Gateway Ready
+
+```text
+STREAK_CHALLENGES
+```
+
+Defines streak betting plans:
+
+- 3 days → 1.5x
+- 7 days → 2x
+- 14 days → 3x
+- 30 days → 5x
+
+```text
+init_db()
+```
+
+Creates database tables.
+
+Main tables:
+
+- `users`
+- `courses`
+- `videos`
+- `enrollments`
+- `video_progress`
+- `quizes`
+- `quiz_submissions`
+- `payment_transactions`
+- `streak_bets`
+- `ai_chat_messages`
+
+```text
+buy(course_id)
+```
+
+Handles course purchase using selected payment method and creates protected payment transaction records.
+
+```text
+place_bet()
+```
+
+Handles streak betting challenge creation.
+
+```text
+complete_video(video_id)
+```
+
+Marks a video as completed and updates active streak progress.
+
+```text
+chatbot()
+```
+
+Handles learner help chatbot communication.
+
+---
+
+## Templates Folder
+
+```text
+templates/
+```
+
+Contains all HTML pages rendered by Flask.
+
+---
+
+### `templates/learner.html`
+
+Main learner dashboard.
+
+Handles learner-side UI for:
+
+- Wallet balance
+- Learning points
+- My courses
+- Per-course progress tracker
+- Course roadmap
+- Attendance marking
+- Certificate unlock button
+- Payment protection panel
+- Payment history
+- EduInsure protection concepts
+- Streak betting challenge UI
+- Active bet display
+- Bet history table
+- Chart.js analytics dashboard
+- Topics completed
+- Weak areas
+- Reels-style learning feed
+- Course video section
+- Quiz submission and resubmission
+- Course marketplace
+- Payment method selection
+- Floating learner help chatbot
+
+Important frontend sections:
+
+```text
+#my-courses
+```
+
+Shows enrolled courses, progress percentage, and roadmap.
+
+```text
+#protection
+```
+
+Shows FinTech + EduInsure concepts and payment history.
+
+```text
+#streaks
+```
+
+Shows streak betting form, active bet, and bet history.
+
+```text
+#analytics
+```
+
+Shows Chart.js progress graph, topics completed, and weak areas.
+
+```text
+#reels
+```
+
+Shows vertical reels-style learning cards using course videos.
+
+```text
+#market
+```
+
+Shows courses available for purchase and payment method selection.
+
+```text
+.chatbot
+```
+
+Floating AI/help chatbot UI.
+
+---
+
+### `templates/creator.html`
+
+Main creator dashboard.
+
+Handles creator-side UI for:
+
+- Released revenue
+- Course count
+- Video count
+- Quiz submissions count
+- Protected payment count
+- Course publishing
+- Course management
+- Notice board updates
+- Video upload
+- Quiz creation
+- Protected payment records
+- Learner attendance
+- Completion status
+- Creator payment release status
+- Quiz evaluation and feedback
+
+Important frontend sections:
+
+```text
+#publish
+```
+
+Creator course publishing form.
+
+```text
+#courses
+```
+
+Course management, notices, video upload, and quiz creation.
+
+```text
+#payments
+```
+
+Protected payment and EduInsure status table.
+
+```text
+#attendance
+```
+
+Learner attendance and course completion tracking.
+
+```text
+#submissions
+```
+
+Quiz submission evaluation panel.
+
+---
+
+### `templates/login.html`
+
+Login page for learners and creators.
+
+Handles:
+
+- Username input
+- Password input
+- Login form submission
+- Navigation to signup
+
+---
+
+### `templates/signup.html`
+
+Signup page.
+
+Handles:
+
+- New user account creation
+- Role selection:
+  - Learner
+  - Creator
+
+---
+
+### `templates/certificate.html`
+
+Certificate display page.
+
+Handles:
+
+- Certificate title
+- Learner name
+- Course name
+- Creator name
+- Completion date
+- Verification token
+- QR/public verification link
+- PDF certificate download button
+
+---
+
+### `templates/verify_certificate.html`
+
+Public certificate verification page.
+
+Handles:
+
+- Certificate token verification
+- Valid certificate display
+- Invalid certificate message
+
+---
+
+## Database File
+
+### `edtech.db`
+
+SQLite database file generated by the Flask app.
+
+Stores:
+
+- Users
+- Courses
+- Videos
+- Enrollments
+- Video progress
+- Quiz questions
+- Quiz submissions
+- Protected payments
+- Streak bets
+- Chatbot messages
+
+This file is created and updated automatically when the app runs.
+
+---
+
+## Requirements File
+
+### `requirements.txt`
+
+Python package list.
+
+Current dependencies:
+
+- Flask
+- Werkzeug
+- reportlab
+- qrcode[pil]
+- Pillow
+
+Used for:
+
+- Web application backend
+- Password hashing
+- PDF certificate generation
+- QR code generation
+- Image handling for PDF certificates
+
+---
+
+## Project Report Files
+
+### `Sachet_EdTech_Project_Report.tex`
+
+LaTeX source file for the project report.
+
+Contains written documentation for the Sachet EdTech system.
+
+---
+
+### `Sachet_EdTech_Project_Report_LaTeX.zip`
+
+Downloadable ZIP package of the LaTeX report files.
+
+---
+
+## Presentation File
+
+### `Sachet_EdTech_Project_Presentation.pptx`
+
+PowerPoint presentation for the project.
+
+Covers:
+
+- Problem statement
+- Proposed solution
+- Features
+- Technology stack
+- Business model
+- Future scope
+
+---
+
+## Generated Cache Folder
+
+### `__pycache__/`
+
+Python-generated cache folder.
+
+Contains compiled Python bytecode such as:
+
+```text
+run.cpython-311.pyc
+```
+
+This is automatically generated by Python and does not need manual editing.
+
+---
+
+## Feature-to-File Mapping
+
+| Feature | Main File |
+|---|---|
+| User signup/login | `run.py`, `templates/signup.html`, `templates/login.html` |
+| Learner dashboard | `run.py`, `templates/learner.html` |
+| Creator dashboard | `run.py`, `templates/creator.html` |
+| Course publishing | `run.py`, `templates/creator.html` |
+| Video learning | `run.py`, `templates/learner.html`, `templates/creator.html` |
+| Attendance tracking | `run.py`, `templates/learner.html`, `templates/creator.html` |
+| Quiz creation | `run.py`, `templates/creator.html` |
+| Quiz submission | `run.py`, `templates/learner.html` |
+| Quiz evaluation | `run.py`, `templates/creator.html` |
+| Creator revenue release | `run.py`, `templates/creator.html` |
+| Protected payment methods | `run.py`, `templates/learner.html` |
+| EduInsure protection concepts | `run.py`, `templates/learner.html`, `templates/creator.html` |
+| Streak betting | `run.py`, `templates/learner.html` |
+| Bet history | `run.py`, `templates/learner.html`, `edtech.db` |
+| Course progress tracker | `run.py`, `templates/learner.html` |
+| Course roadmap | `templates/learner.html` |
+| Chart.js analytics | `run.py`, `templates/learner.html` |
+| Reels-style learning UI | `templates/learner.html` |
+| AI/help chatbot | `run.py`, `templates/learner.html` |
+| Certificate page | `run.py`, `templates/certificate.html` |
+| PDF certificate | `run.py` |
+| QR certificate verification | `run.py`, `templates/verify_certificate.html` |
+| Project report | `Sachet_EdTech_Project_Report.tex` |
+| Presentation | `Sachet_EdTech_Project_Presentation.pptx` |
+
+---
+
+## Recommended Editing Guide
+
+For backend logic, edit:
+
+```text
+run.py
+```
+
+For learner UI, edit:
+
+```text
+templates/learner.html
+```
+
+For creator UI, edit:
+
+```text
+templates/creator.html
+```
+
+For login/signup pages, edit:
+
+```text
+templates/login.html
+templates/signup.html
+```
+
+For certificate pages, edit:
+
+```text
+templates/certificate.html
+templates/verify_certificate.html
+```
+
+For dependencies, edit:
+
+```text
+requirements.txt
+```
